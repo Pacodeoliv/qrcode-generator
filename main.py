@@ -1,6 +1,6 @@
 import segno
 import os
-
+import urllib.parse
 dirt = "C:/Users/Paco De Oliveira/PycharmProjects/qr-codegenerator/qrcodes_directory"
 
 if not os.path.exists(dirt):
@@ -30,11 +30,24 @@ I was trying to learn how i shouldve done here
 
 
 
-alternative = input("Type your QRcode:") #Receive from user what's supposed to be created
-alt = alternative
-alt1 = os.path.join(dirt,f"{alt}.png")
-if not os.path.exists(alt1):
-    qr_code = segno.make(alt) #Makes the QRcode with .make
-    qr_code.save(alt1)   #Saves the QRcode
+# Receive from the user what will be used to create the QR Code (can be a link or text)
+alternative = input("Enter what you want to include in the QR Code (can be a link or text): ")
+
+# Check if what the user entered is a link or text
+if alternative.startswith("http://") or alternative.startswith("https://"):
+    # If it's a link, create the QR Code with the provided link
+    url = alternative
+    filename = urllib.parse.quote_plus(url) + ".png"
+    qr_code = segno.make(url)
 else:
-    print("The archive already exists")
+    # If it's text, use the text as the content of the QR Code
+    filename = f"{alternative}.png"
+    qr_code = segno.make(alternative)
+
+# Save the QR Code as a PNG image
+qr_code_path = os.path.join(dirt, filename)
+if not os.path.exists(qr_code_path):
+    qr_code.save(qr_code_path, scale=10)
+    print(f"QR Code saved at: {qr_code_path}")
+else:
+    print("The file already exists.")
